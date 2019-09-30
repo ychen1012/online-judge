@@ -2,7 +2,6 @@ package cn.oj.onlinejudge.handler.base;
 
 import cn.oj.onlinejudge.util.ExecutorUtil;
 import cn.oj.onlinejudge.util.FileUtils;
-import cn.oj.onlinejudge.util.ZipUtils;
 import cn.oj.onlinejudge.vo.JudgeResult;
 import cn.oj.onlinejudge.vo.JudgeTask;
 import cn.oj.onlinejudge.vo.ResultCase;
@@ -45,8 +44,6 @@ public abstract class Handler {
 	@Value("${judge.scriptPath}")
 	private String script;
 
-	@Value("${judge.download}")
-	private String download;
 
 	/**
 	 * 验证参数是否合法
@@ -130,13 +127,6 @@ public abstract class Handler {
 					outFile.createNewFile();
 					FileUtils.write(task.getOutput().get(i), outFile);
 				}
-			} else {//download the testData
-				String param = download.replace("{ProId}", task.getProId().toString()).replace("PATH", path.getPath());
-				ExecutorUtil.ExecMessage msg = ExecutorUtil.exec(param, 5000);
-				if (msg.getError() == null || !msg.getError().contains("0K")) {
-					throw new IOException("文件目录出错！");
-				}
-				ZipUtils.unzip(path.getPath() + File.separator + "main.zip", path.getPath());
 			}
 			createSrc(task, path);
 		} catch (IOException e) {
