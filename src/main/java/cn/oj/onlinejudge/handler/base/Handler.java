@@ -145,7 +145,8 @@ public abstract class Handler {
 	 */
 	private boolean compiler(JudgeResult result, File path) {
 		ExecutorUtil.ExecMessage msg = HandlerCompiler(path);
-		if (msg.getError() != null) {
+		//if (msg.getError() != null) {
+		if(msg.getError()!=null && msg.getError().indexOf("error")!=-1){
 			result.setGlobalMsg(msg.getError());
 			return false;
 		}
