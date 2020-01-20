@@ -145,7 +145,8 @@ public abstract class Handler {
 	 */
 	private boolean compiler(JudgeResult result, File path) {
 		ExecutorUtil.ExecMessage msg = HandlerCompiler(path);
-		if (msg.getError() != null) {
+		//if (msg.getError() != null) {
+		if(msg.getError()!=null && msg.getError().indexOf("error")!=-1){
 			result.setGlobalMsg(msg.getError());
 			return false;
 		}
@@ -174,7 +175,7 @@ public abstract class Handler {
 			}
 			String param = pre + inFile.getPath() + " " + outFile.getPath();
 			String cmd = "python " + script + " " + param;
-			ExecutorUtil.ExecMessage msg = ExecutorUtil.exec(cmd, 50000);
+			ExecutorUtil.ExecMessage msg = ExecutorUtil.exec(cmd, 4000);
 			ResultCase caseOne = JSON.parseObject(msg.getStdout(), ResultCase.class);
 			//运行报错
 			if (msg.getError() != null) {
