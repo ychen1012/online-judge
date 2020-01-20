@@ -1,0 +1,22 @@
+1、controller入口，并传参数
+参数JudgeTask
+{
+    Integer proId;//编译版本id，新版本可以去掉；
+    List<String>input;//输入测试用例；
+    List<String>output;//输出测试用例；
+    Long timeLimit;//时间限制；
+    Long memoryLimit；//内存限制；
+    Integer judgeId；//判题id；
+    String src;//源代码；
+}
+
+2、检查judgeTask 参数正确性；
+3、处理参数，把测试用例写成.in\.out 文件；
+4、创建工作目录，如果存在，删除重建；
+5、编译，如果对应文件夹的中已经存在，重新编译；
+6、调用runSrc 实际运行代码，并且返回结果；
+7、运行完删除；
+
+我觉得返回结果还可以继续优化；
+返回报错的前100吧；
+算分那里优化；
