@@ -20,3 +20,10 @@
 我觉得返回结果还可以继续优化；
 返回报错的前100吧；
 算分那里优化；
+
+
+//如果不考虑安全性呢？
+可以直接用Java写吧
+就不用封装 .in/.out了。少了io O(n)个；
+
+https://www.howtoing.com/disable-shutdown-and-reboot-commands-in-linux
