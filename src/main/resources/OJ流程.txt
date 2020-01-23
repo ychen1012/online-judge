@@ -27,3 +27,9 @@
 就不用封装 .in/.out了。少了io O(n)个；
 
 https://www.howtoing.com/disable-shutdown-and-reboot-commands-in-linux
+
+linux system_call
+https://blog.csdn.net/SunnyBeiKe/article/details/6899959
+https://www.jianshu.com/p/f60fa2b09761
+https://blog.csdn.net/xiaominthere/article/details/17287965
+https://blog.csdn.net/hq815601489/article/details/80009791
