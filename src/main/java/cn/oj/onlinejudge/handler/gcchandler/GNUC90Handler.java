@@ -16,7 +16,7 @@ public class GNUC90Handler extends CHandler {
 	@Override
 	protected ExecutorUtil.ExecMessage HandlerCompiler(File path) {
 		String cmd = compilerWord.replace("PATH",path.getPath());
-		ExecutorUtil.ExecMessage msg = ExecutorUtil.exec(cmd, 3000);
+		ExecutorUtil.ExecMessage msg = ExecutorUtil.exec(cmd, 1000);
 		return msg;
 	}
 }
