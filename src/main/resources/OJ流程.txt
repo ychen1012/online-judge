@@ -33,3 +33,27 @@ https://blog.csdn.net/SunnyBeiKe/article/details/6899959
 https://www.jianshu.com/p/f60fa2b09761
 https://blog.csdn.net/xiaominthere/article/details/17287965
 https://blog.csdn.net/hq815601489/article/details/80009791
+
+
+
+
+1、通过/judge.do 入口传入JudgeTask 参数
+2、根据参数选择代码语言
+3、验证参数正确性
+4、创建工作目录，从预先设定的目录中，替换实际的目录地址
+5、编译
+6、如果编译通过运行比较（多线程处理）
+7、返回编译结果
+8、其实为了安全考虑还是应该docker内运行
+
+
+
+todo：管理员相关：
+        管理员界面优化
+        管理员控制功能的开启和关闭(如何能够在不重启的情况下完成)--->前端的动态菜单
+        日志监控下载
+        jwt token加密
+        前端的日志上报
+        各类导出的优化
+        导入上传的优化
+        界面交互

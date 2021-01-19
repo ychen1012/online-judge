@@ -168,6 +168,7 @@ public abstract class Handler {
 			task.getMemoryLimit() + " ";
 		List<ResultCase> cases = new ArrayList<>();
 		for (int i = 0; ; i++) {
+			//这块能用多线程吗？可以的，这样就可以多个测试用例，多线程执行了，
 			File inFile = new File(path.getPath() + File.separator + i + ".in");
 			File outFile = new File(path.getPath() + File.separator + i + ".out");
 			if (!inFile.exists() || !outFile.exists()) {
@@ -188,6 +189,7 @@ public abstract class Handler {
 			}
 			cases.add(caseOne);
 		}
+		//这里，等所有线程的结果返回以后再统一返回，多个线程会提高速度
 		result.setResult(cases);
 	}
 
