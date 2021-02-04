@@ -17,207 +17,212 @@ import java.util.List;
  * Base Handler
  */
 public abstract class Handler {
-	/**
-	 * 'Accepted',
-	 * 'Presentation Error',
-	 * 'Time Limit Exceeded',
-	 * 'Memory Limit Exceeded',
-	 * 'Wrong Answer',
-	 * 'Runtime Error',
-	 * 'Output Limit Exceeded',
-	 * 'Compile Error',
-	 * 'System Error'
-	 */
-	protected final int AC = 0;
-	protected final int PE = 1;
-	protected final int TLE = 2;
-	protected final int MLE = 3;
-	protected final int WE = 4;
-	protected final int RE = 5;
-	protected final int OLE = 6;
-	protected final int CE = 7;
-	protected final int SE = 8;
+    /**
+     * 'Accepted',
+     * 'Presentation Error',
+     * 'Time Limit Exceeded',
+     * 'Memory Limit Exceeded',
+     * 'Wrong Answer',
+     * 'Runtime Error',
+     * 'Output Limit Exceeded',
+     * 'Compile Error',
+     * 'System Error'
+     */
+    protected final int AC = 0;
+    protected final int PE = 1;
+    protected final int TLE = 2;
+    protected final int MLE = 3;
+    protected final int WE = 4;
+    protected final int RE = 5;
+    protected final int OLE = 6;
+    protected final int CE = 7;
+    protected final int SE = 8;
 
-	@Value("${judge.judgePath}")
-	private String judgePath;
+    @Value("${judge.judgePath}")
+    private String judgePath;
 
-	@Value("${judge.scriptPath}")
-	private String script;
+    @Value("${judge.scriptPath}")
+    private String script;
 
 
-	/**
-	 * 验证参数是否合法
-	 *
-	 * @param task   task.
-	 * @param result result.
-	 * @return bool.
-	 */
-	private boolean checkTask(JudgeTask task, JudgeResult result) {
-		if (task.getProId() == null) {
-			if (task.getInput() == null || task.getOutput() == null
-				|| task.getInput().size() == 0 || task.getOutput().size() == 0) {
-				result.setGlobalMsg("测试数据不能为空!");
-				return false;
-			}
-			if (task.getInput().size() != task.getOutput().size()) {
-				result.setGlobalMsg("测试数据组数不对应!");
-				return false;
-			}
-		}
-		if (task.getSrc() == null || task.getSrc().trim().equals("")) {
-			result.setGlobalMsg("测试代码不能为空!");
-			return false;
-		}
-		if (task.getTimeLimit() == null || task.getMemoryLimit() == null) {
-			result.setGlobalMsg("时间消耗、空间消耗不能为空!");
-			return false;
-		}
-		if (task.getTimeLimit() < 0 || task.getTimeLimit() > 5000) {
-			result.setGlobalMsg("时间消耗应在范围0-5s内!");
-			return false;
-		}
-		if (task.getMemoryLimit() < 0 || task.getMemoryLimit() > 524288) {
-			result.setGlobalMsg("空间消耗应在范围524288kb内!");
-			return false;
-		}
-		return true;
-	}
+    /**
+     * 验证参数是否合法
+     *
+     * @param task   task.
+     * @param result result.
+     * @return bool.
+     */
+    private boolean checkTask(JudgeTask task, JudgeResult result) {
+        if (task.getProId() == null) {
+            if (task.getInput() == null || task.getOutput() == null
+                    || task.getInput().size() == 0 || task.getOutput().size() == 0) {
+                result.setGlobalMsg("测试数据不能为空!");
+                return false;
+            }
+            if (task.getInput().size() != task.getOutput().size()) {
+                result.setGlobalMsg("测试数据组数不对应!");
+                return false;
+            }
+        }
+        if (task.getSrc() == null || task.getSrc().trim().equals("")) {
+            result.setGlobalMsg("测试代码不能为空!");
+            return false;
+        }
+        if (task.getTimeLimit() == null || task.getMemoryLimit() == null) {
+            result.setGlobalMsg("时间消耗、空间消耗不能为空!");
+            return false;
+        }
+        if (task.getTimeLimit() < 0 || task.getTimeLimit() > 5000) {
+            result.setGlobalMsg("时间消耗应在范围0-5s内!");
+            return false;
+        }
+        if (task.getMemoryLimit() < 0 || task.getMemoryLimit() > 524288) {
+            result.setGlobalMsg("空间消耗应在范围524288kb内!");
+            return false;
+        }
+        return true;
+    }
 
-	/**
-	 * （模板方法）创建对应的源程序
-	 *
-	 * @throws IOException
-	 */
-	protected abstract void createSrc(JudgeTask task, File path) throws IOException;
+    /**
+     * （模板方法）创建对应的源程序
+     *
+     * @throws IOException
+     */
+    protected abstract void createSrc(JudgeTask task, File path) throws IOException;
 
-	/**
-	 * 编译（模板方法）
-	 *
-	 * @param path
-	 * @return
-	 */
-	protected abstract ExecutorUtil.ExecMessage HandlerCompiler(File path);
+    /**
+     * 编译（模板方法）
+     *
+     * @param path
+     * @return
+     */
+    protected abstract ExecutorUtil.ExecMessage HandlerCompiler(File path);
 
-	/**
-	 * 运行命令（模板方法）
-	 *
-	 * @param path
-	 * @return
-	 */
-	protected abstract String getRunCommand(File path);
+    /**
+     * 运行命令（模板方法）
+     *
+     * @param path
+     * @return
+     */
+    protected abstract String getRunCommand(File path);
 
-	/**
-	 * 创建工作目录
-	 *
-	 * @param task
-	 * @param result
-	 * @param path
-	 * @return
-	 */
-	private boolean createWorkspace(JudgeTask task, JudgeResult result, File path) {
-		try {
-			if (!path.exists())
-				path.mkdirs();
-			if (task.getProId() == null) {//create input and output
-				for (int i = 0; i < task.getInput().size(); i++) {
-					File inFile = new File(path, i + ".in");
-					File outFile = new File(path, i + ".out");
-					inFile.createNewFile();
-					FileUtils.write(task.getInput().get(i), inFile);
-					outFile.createNewFile();
-					FileUtils.write(task.getOutput().get(i), outFile);
-				}
-			}
-			createSrc(task, path);
-		} catch (IOException e) {
-			result.setGlobalMsg("服务器工作目录出错:"+e);
-			return false;
-		}
-		return true;
-	}
+    /**
+     * 创建工作目录
+     *
+     * @param task
+     * @param result
+     * @param path
+     * @return
+     */
+    private boolean createWorkspace(JudgeTask task, JudgeResult result, File path) {
+        try {
+            if (!path.exists())
+                path.mkdirs();
+            if (task.getProId() == null) {//create input and output
+                for (int i = 0; i < task.getInput().size(); i++) {
+                    File inFile = new File(path, i + ".in");
+                    File outFile = new File(path, i + ".out");
+                    inFile.createNewFile();
+                    FileUtils.write(task.getInput().get(i), inFile);
+                    outFile.createNewFile();
+                    FileUtils.write(task.getOutput().get(i), outFile);
+                }
+            }
+            createSrc(task, path);
+        } catch (IOException e) {
+            result.setGlobalMsg("服务器工作目录出错:" + e);
+            return false;
+        }
+        return true;
+    }
 
-	/**
-	 * 编译程序
-	 *
-	 * @param result
-	 * @param path
-	 * @return
-	 */
-	private boolean compiler(JudgeResult result, File path) {
-		ExecutorUtil.ExecMessage msg = HandlerCompiler(path);
-		//if (msg.getError() != null) {
-		if(msg.getError()!=null && msg.getError().indexOf("error")!=-1){
-			result.setGlobalMsg(msg.getError());
-			return false;
-		}
-		return true;
-	}
+    /**
+     * 编译程序
+     *
+     * @param result
+     * @param path
+     * @return
+     */
+    private boolean compiler(JudgeResult result, File path) {
+        ExecutorUtil.ExecMessage msg = HandlerCompiler(path);
+        //if (msg.getError() != null) {
+        // 20210204 多了一个msg！=null判断，因为python不需要编译，直接返回null了，不加这个判断会有空指针。
 
-	/**
-	 * 测试源程序
-	 *
-	 * @param task
-	 * @param result
-	 * @param path
-	 */
-	private void runSrc(JudgeTask task, JudgeResult result, File path) {
-		//cmd : command tmpFile timeLimit memoryLimit inFile outFile
-		String pre = getRunCommand(path).replace(" ", "@") + " " +
-			path.getPath() + File.separator + "tmp.out" + " " +
-			task.getTimeLimit() + " " +
-			task.getMemoryLimit() + " ";
-		List<ResultCase> cases = new ArrayList<>();
-		for (int i = 0; ; i++) {
-			File inFile = new File(path.getPath() + File.separator + i + ".in");
-			File outFile = new File(path.getPath() + File.separator + i + ".out");
-			if (!inFile.exists() || !outFile.exists()) {
-				break;
-			}
-			String param = pre + inFile.getPath() + " " + outFile.getPath();
-			String cmd = "python " + script + " " + param;
-			ExecutorUtil.ExecMessage msg = ExecutorUtil.exec(cmd, 1000);
-			ResultCase caseOne = JSON.parseObject(msg.getStdout(), ResultCase.class);
-			//运行报错
-			if (msg.getError() != null) {
-				if (caseOne == null)
-					caseOne = new ResultCase();
-				caseOne.setResult(RE);
-				caseOne.setMemoryused(-1L);
-				caseOne.setTimeused(-1L);
-				caseOne.setErrormessage(msg.getError());
-			}
-			cases.add(caseOne);
-		}
-		result.setResult(cases);
-	}
+        if (msg != null && msg.getError() != null && msg.getError().indexOf("error") != -1) {
+            result.setGlobalMsg(msg.getError());
+            return false;
+        }
+        return true;
+    }
 
-	/**
-	 * 判题主流程
-	 *
-	 * @param task
-	 * @return
-	 */
-	public JudgeResult judge(JudgeTask task) {
-		JudgeResult result = new JudgeResult();
-		//检验输入是否合法
-		if (!checkTask(task, result)) {
-			return result;
-		}
-		//创建工作目录
-		File path = new File(judgePath + File.separator + System.currentTimeMillis());
-		if (!createWorkspace(task, result, path)) {
-			ExecutorUtil.exec("rm -rf " + path.getPath(), 1000);
-			return result;
-		}
-		//编译
-		if (!compiler(result, path)) {
-			ExecutorUtil.exec("rm -rf " + path.getPath(), 1000);
-			return result;
-		}
-		runSrc(task, result, path);
-		ExecutorUtil.exec("rm -rf " + path.getPath(), 1000);
-		return result;
-	}
+    /**
+     * 测试源程序
+     *
+     * @param task
+     * @param result
+     * @param path
+     */
+    private void runSrc(JudgeTask task, JudgeResult result, File path) {
+        //cmd : command tmpFile timeLimit memoryLimit inFile outFile
+        String pre = getRunCommand(path).replace(" ", "@") + " " +
+                path.getPath() + File.separator + "tmp.out" + " " +
+                task.getTimeLimit() + " " +
+                task.getMemoryLimit() + " ";
+        List<ResultCase> cases = new ArrayList<>();
+        for (int i = 0; ; i++) {
+            File inFile = new File(path.getPath() + File.separator + i + ".in");
+            File outFile = new File(path.getPath() + File.separator + i + ".out");
+            if (!inFile.exists() || !outFile.exists()) {
+                break;
+            }
+            String param = pre + inFile.getPath() + " " + outFile.getPath();
+            String cmd = "python " + script + " " + param;
+            ExecutorUtil.ExecMessage msg = ExecutorUtil.exec(cmd, 1000);
+            ResultCase caseOne = JSON.parseObject(msg.getStdout(), ResultCase.class);
+            //运行报错
+            if (msg.getError() != null) {
+                if (caseOne == null)
+                    caseOne = new ResultCase();
+                caseOne.setResult(RE);
+                caseOne.setMemoryused(-1L);
+                caseOne.setTimeused(-1L);
+                caseOne.setErrormessage(msg.getError());
+            }
+            cases.add(caseOne);
+        }
+        result.setResult(cases);
+    }
+
+    /**
+     * 判题主流程
+     *
+     * @param task
+     * @return 1、根据前端传来的参数，调用对应的方法创建目录，类似于 xxx/xxxx/main.c    xxx/xxxx/main.java
+     * 2、调用对应的方法进行编译
+     * 3、调用对应的方法进行运行(将代码实际运行结果和测试用例结果进行比对)
+     * 以上三步，如果在哪一步中执行失败（返回false），则直接将错误信息填写在返回值中，直接返回，不会继续执行；
+     */
+    public JudgeResult judge(JudgeTask task) {
+        JudgeResult result = new JudgeResult();
+        //检验输入是否合法
+        if (!checkTask(task, result)) {
+            return result;
+        }
+        //创建工作目录
+        File path = new File(judgePath + File.separator + System.currentTimeMillis());
+        if (!createWorkspace(task, result, path)) {
+            ExecutorUtil.exec("rm -rf " + path.getPath(), 1000);
+            return result;
+        }
+        //编译
+        if (!compiler(result, path)) {
+            ExecutorUtil.exec("rm -rf " + path.getPath(), 1000);
+            return result;
+        }
+        runSrc(task, result, path);
+        ExecutorUtil.exec("rm -rf " + path.getPath(), 1000);
+        return result;
+    }
 
 
 }
